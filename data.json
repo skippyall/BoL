@@ -1,0 +1,24 @@
+{
+    "teachers": [
+        {
+            "name": "Herr Vöhringer",
+            "votes": 16
+        },
+        {
+            "name": "Herr Wehrle",
+            "votes": 18
+        },
+        {
+            "name": "Frau Duttlinger",
+            "votes": 6
+        },
+        {
+            "name": "<b>Wichtiger</b>",
+            "votes": 3
+        },
+        {
+            "name": "Test",
+            "votes": 3
+        }
+    ]
+}
