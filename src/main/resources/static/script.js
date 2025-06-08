@@ -1,18 +1,30 @@
-console.log("Hello World")
+var socket = null;
 
-const socket = new WebSocket(window.location.origin + "/websocket")
-socket.onmessage = (event) => {
-    var data = JSON.parse(event.data)
-    console.log(data)
+function connect() {
+    socket = new WebSocket(window.location.origin + "/websocket")
+    socket.onmessage = (event) => {
+        var data = JSON.parse(event.data)
+        console.log(data)
 
-    if(data.type == "data") {
-        handleDataMessage(data.vote)
-    } else if (data.type == "update") {
-        handleUpdateMessage(data.teacher)
+        if(data.type == "data") {
+            handleDataMessage(data.vote)
+        } else if (data.type == "update") {
+            handleUpdateMessage(data.teacher)
+        }
     }
 }
 
+function checkConnected() {
+
+}
+
 function handleDataMessage(data) {
+    var container = document.getElementById("teacher_buttons")
+        
+    while (container.firstChild) {
+        container.removeChild(container.firstChild);
+    }
+
     for(teacher of data.teachers) {
         updateTeacher(teacher)
     }
@@ -79,3 +91,5 @@ function onButtonClick(teacher) {
         "name": teacher
     }))
 }
+
+connect()
