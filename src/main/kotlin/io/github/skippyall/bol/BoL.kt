@@ -14,8 +14,9 @@ import java.io.IOException
 
 object BoL {
     val logger = LoggerFactory.getLogger("BoL")
-    var vote: Vote = Vote()
+    var votes: MutableMap<String,Vote> = mutableMapOf()
     var handlers = mutableSetOf<WsContext>()
+    var handlersToVote = mutableMapOf<WsContext,Vote>()
 
     val pretty = Json {
         prettyPrint = true
@@ -112,8 +113,18 @@ object BoL {
 
     fun sendToEveryone(message: Message) {
         for (remote in handlers) {
-            remote.send(Json.encodeToString(message))
+            send(remote, message)
         }
+    }
+
+    fun sendToVote(vote: Vote, message: Message) {
+        for (remote in handlers) {
+            
+        }
+    }
+
+    fun send(remote: WsContext, message: Message) {
+        remote.send(Json.encodeToString(message))
     }
 }
 
