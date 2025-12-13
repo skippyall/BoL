@@ -13,7 +13,7 @@ class ClickMessage(var name: String) : Message() {
         if(vote == null) {
             return
         }
-        val teacher = vote.teachers.first { teacher -> teacher.name == name}
+        val teacher = vote.voteOptions.first { teacher -> teacher.name == name}
         teacher.votes++
 
         vote.updateTeacher(teacher)

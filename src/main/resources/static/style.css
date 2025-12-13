@@ -7,6 +7,10 @@
     background-color: lime;
 }
 
+#controls{
+    margin: 10px;
+}
+
 nav{
     padding-bottom: 10px;
 }

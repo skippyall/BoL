@@ -4,25 +4,25 @@ import io.github.skippyall.bol.message.UpdateMessage
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Vote(var teachers: MutableList<Teacher>) {
+data class Vote(var voteOptions: MutableList<VoteOption>) {
     constructor() : this(mutableListOf())
 
     @Serializable
-    data class Teacher(var name: String, var votes: Int) {
+    data class VoteOption(var name: String, var votes: Int) {
         constructor(name: String) : this(name, 0)
     }
 
-    fun addTeacherAndUpdate(teacher: Teacher) {
-        teachers += teacher
-        updateTeacher(teacher)
+    fun addTeacherAndUpdate(voteOption: VoteOption) {
+        voteOptions += voteOption
+        updateTeacher(voteOption)
     }
 
-    fun removeTeacherAndUpdate(teacher: Teacher) {
-        teachers += teacher
-        updateTeacher(teacher)
+    fun removeTeacherAndUpdate(voteOption: VoteOption) {
+        voteOptions += voteOption
+        updateTeacher(voteOption)
     }
 
-    fun updateTeacher(teacher: Teacher) {
-        UpdateMessage(teacher).sendToVote(this)
+    fun updateTeacher(voteOption: VoteOption) {
+        UpdateMessage(voteOption).sendToVote(this)
     }
 }

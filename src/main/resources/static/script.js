@@ -5,6 +5,9 @@ var vote = null;
 /** @type {HTMLElement}*/ var container = null
 /** @type {HTMLInputElement} */ var nameInput = null
 
+var sortType = "abc"
+/** @type {HTMLSelectElement}*/ var sortTypeSelect = null
+
 const messageHandlers = {
     "listVotes": handleListVotesMessage,
     "data": handleDataMessage,
@@ -15,6 +18,7 @@ const messageHandlers = {
 function connect() {
     socket = new WebSocket(window.location.origin + "/websocket")
     socket.onopen = () => {
+        console.log("onopen")
         if(vote != null) {
             socket.send(JSON.stringify({
                 "type": "joinVote",
@@ -47,6 +51,7 @@ function onLoseConnection() {
 
 function init() {
     initVoteSelect()
+    initSortSelect()
     container = document.getElementById("teacher_buttons")
     nameInput = document.getElementById("name")
 }
@@ -57,10 +62,6 @@ function reset() {
 }
 
 function changeVote(newVote) {
-    if(vote == newVote) {
-        return
-    }
-
     vote = newVote
 
     socket.send(JSON.stringify({
@@ -73,13 +74,13 @@ function changeVote(newVote) {
 function handleDataMessage(data) {
     resetButtons()
 
-    for(teacher of data.vote.teachers) {
+    for(teacher of data.vote.voteOptions) {
         updateTeacher(teacher)
     }
 }
 
 function handleUpdateMessage(data) {
-    updateTeacher(data.teacher)
+    updateTeacher(data.voteOption)
 }
 
 function handleListVotesMessage(data) {
@@ -91,7 +92,7 @@ function handleListVotesMessage(data) {
 }
 
 function handleConfirmMessage(data) {
-    /** @type {HTMLButtonElement}*/ const button = findButton(data.teacher)
+    /** @type {HTMLButtonElement}*/ const button = findButton(data.voteOption)
     button.classList.add("confirm_button")
     setTimeout(() => button.classList.remove("confirm_button"), 500)
 }
@@ -116,22 +117,6 @@ function resetVoteSelect() {
     }
 }
 
-/*async function updateAllButtons() {
-    var response = await fetch(window.location.origin + "/data")
-    if(response.ok) {
-        var data = await response.json()
-        
-        var container = document.getElementById("teacher_buttons")
-        while (container.firstChild) {
-            container.removeChild(container.firstChild);
-        }
-
-        for(teacher of data.teachers) {
-            updateTeacher(teacher)
-        }
-    }
-}*/
-
 function resetButtons() {
     while (container.firstChild) {
         container.removeChild(container.firstChild);
@@ -148,18 +133,21 @@ function updateTeacher(teacher) {
         var button = document.createElement("button")
         button.setAttribute("class", "teacher_button")
         button.setAttribute("teacher", name)
+        
 
         button.onclick = () => onButtonClick(name)
 
         paragraph = document.createElement("p")
 
         button.appendChild(paragraph)
-        container.appendChild(button)
 
     } else {
         paragraph = button.firstChild
+        button.remove()
     }
 
+    button.setAttribute("votes", votes)
+    insertButton(button, container.lastChild)
     paragraph.innerText = name + " " + votes
 }
 
@@ -184,6 +172,55 @@ function onButtonClick(teacher) {
         "type": "click",
         "name": teacher
     }))
+}
+
+function sortButtons() {
+    const size = container.children.length
+    for(var i = 1; i < size; i++) {
+        var button = container.children[i]
+        var init = button.previousElementSibling
+
+        button.remove()
+        insertButton(button, init)
+    }
+}
+
+function insertButton(button, initButton) {
+    var compareButton = initButton
+    while(compareButton && compare(compareButton, button)) {
+        compareButton = compareButton.previousElementSibling
+    }
+
+    if(compareButton) {
+        compareButton.after(button)
+    } else {
+        if(container.firstChild) {
+            container.firstChild.before(button)
+        } else {
+            container.appendChild(button)
+        }
+    }
+}
+
+function compare(button1, button2) {
+    if(sortType == "abc") {
+        return button1.getAttribute("teacher").localeCompare(button2.getAttribute("teacher")) > 0
+    }
+    if(sortType == "votes") {
+        return Number(button1.getAttribute("votes")) < Number(button2.getAttribute("votes"))
+    }
+}
+
+function initSortSelect() {
+    sortTypeSelect = document.getElementById("sort_type")
+    
+    sortTypeSelect.addEventListener("change", onSortChange)
+}
+
+function onSortChange() {
+    sortType = sortTypeSelect.value
+
+    sortButtons()
 }
 
 window.onload = init

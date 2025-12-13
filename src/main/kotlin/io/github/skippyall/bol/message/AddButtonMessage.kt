@@ -15,6 +15,10 @@ class AddButtonMessage(val name: String) : Message() {
             return
         }
 
-        vote.addTeacherAndUpdate(Vote.Teacher(name))
+        if(vote.voteOptions.find { it.name == name } != null) {
+            return
+        }
+
+        vote.addTeacherAndUpdate(Vote.VoteOption(name))
     }
 }

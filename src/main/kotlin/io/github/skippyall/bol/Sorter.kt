@@ -3,9 +3,9 @@ package io.github.skippyall.bol
 fun main() {
     BoL.load()
     for(vote in BoL.votes.values) {
-        vote.teachers.sortWith((Comparator.comparingInt<Vote.Teacher> { teacher -> teacher.votes }).reversed())
-        while(vote.teachers.size > 3) {
-            vote.teachers.removeLast()
+        vote.voteOptions.sortWith((Comparator.comparingInt<Vote.VoteOption> { teacher -> teacher.votes }).reversed())
+        while(vote.voteOptions.size > 3) {
+            vote.voteOptions.removeLast()
         }
     }
     BoL.save()

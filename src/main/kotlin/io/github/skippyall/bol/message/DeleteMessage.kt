@@ -5,4 +5,4 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 @SerialName("delete")
-class DeleteMessage(val teacher: String) : Message()
+class DeleteMessage(val voteOption: String) : Message()

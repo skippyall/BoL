@@ -24,48 +24,7 @@ object BoL {
 
     val dataFile = File("data.json")
 
-    val javalin: Javalin = Javalin.create { config ->
-        config.staticFiles.add { staticFileConfig ->
-            staticFileConfig.location = Location.CLASSPATH
-            staticFileConfig.directory = "static"
-        }
-    }
-        .get("/") {
-            it.redirect("/vote.html")
-        }
-        .get("/data") {
-            //it.json(Json.encodeToString(vote))
-        }
-        /*.post("/add_button_confirm") {
-            val arguments = splitKeyValueStringAndGroupByKey(it.body(), "UTF-8")
-            val name = arguments["name"]?.get(0)
-            if(name != null) {
-                if(vote.teachers.firstOrNull{it.name == name} == null) {
-                    vote.addTeacherAndUpdate(Vote.Teacher(name))
-                    it.redirect("/add_button_success.html")
-                } else {
-                    it.redirect("/add_button_error.html")
-                }
-            }
-        }*/
-        .ws("/websocket") {
-            it.onMessage {
-                try {
-                    Json.decodeFromString<Message>(it.message()).onReceive(it)
-                } catch (e: Exception) {
-                    logger.error("Error while decoding message from client", e)
-                }
-            }
-
-            it.onConnect { handler ->
-                ListVotesMessage(votes.keys).send(handler)
-                handlers.add(handler)
-            }
-
-            it.onClose { handler ->
-                handlers.remove(handler)
-            }
-        }
+    lateinit var javalin: Javalin
 
     val saveThread = Thread {
         try {
@@ -80,15 +39,45 @@ object BoL {
         } catch (_: InterruptedException) {}
     }
 
-    @JvmStatic
     fun main() {
         start()
-        while(!readLine().equals("stop")) {}
+        while(!readlnOrNull().equals("stop")) {}
         stop()
     }
 
     fun start() {
         load()
+
+        javalin = Javalin.create { config ->
+            config.staticFiles.add { staticFileConfig ->
+                staticFileConfig.location = Location.CLASSPATH
+                staticFileConfig.directory = "static"
+            }
+        }
+            .get("/") {
+                it.redirect("/vote.html")
+            }
+            .get("/data") {
+                it.result(Json.encodeToString(votes))
+            }
+            .ws("/websocket") {
+                it.onMessage {
+                    try {
+                        Json.decodeFromString<Message>(it.message()).onReceive(it)
+                    } catch (e: Exception) {
+                        logger.error("Error while decoding message from client", e)
+                    }
+                }
+
+                it.onConnect { handler ->
+                    ListVotesMessage(votes.keys).send(handler)
+                    handlers.add(handler)
+                }
+
+                it.onClose { handler ->
+                    handlers.remove(handler)
+                }
+            }
 
         javalin.start(25602)
         saveThread.start()

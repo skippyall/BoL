@@ -5,4 +5,4 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 @SerialName("confirm")
-class ConfirmMessage(val teacher: String) : Message()
+class ConfirmMessage(val voteOption: String) : Message()

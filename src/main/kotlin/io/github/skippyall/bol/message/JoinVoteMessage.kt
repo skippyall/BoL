@@ -15,5 +15,7 @@ class JoinVoteMessage(val voteName: String) : Message() {
         }
         DataMessage(vote).send(context)
         BoL.handlersToVote[context.sessionId()] = vote
+
+        println("Vote switch to $voteName")
     }
 }
