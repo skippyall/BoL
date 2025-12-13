@@ -23,6 +23,6 @@ data class Vote(var teachers: MutableList<Teacher>) {
     }
 
     fun updateTeacher(teacher: Teacher) {
-        UpdateMessage(teacher).sendToEveryone()
+        UpdateMessage(teacher).sendToVote(this)
     }
 }

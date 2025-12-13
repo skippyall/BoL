@@ -6,4 +6,4 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 @SerialName("update")
-class UpdateMessage(var teacher: Vote.Teacher) : Message()
+class UpdateMessage(val teacher: Vote.Teacher) : Message()

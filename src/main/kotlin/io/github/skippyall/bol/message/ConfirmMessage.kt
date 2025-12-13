@@ -1,3 +1,8 @@
 package io.github.skippyall.bol.message
 
-class ConfirmMessage(teacher: String)
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+
+@Serializable
+@SerialName("confirm")
+class ConfirmMessage(val teacher: String) : Message()
