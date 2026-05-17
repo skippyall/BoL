@@ -10,10 +10,7 @@ import kotlinx.serialization.Serializable
 @SerialName("addButton")
 class AddButtonMessage(val name: String) : Message() {
     override fun onReceive(context: WsContext) {
-        val vote = BoL.getVote(context)
-        if(vote == null) {
-            return
-        }
+        val vote = BoL.getVote(context) ?: return
 
         if(vote.voteOptions.find { it.name == name } != null) {
             return

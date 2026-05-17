@@ -5,7 +5,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Vote(var voteOptions: MutableList<VoteOption>) {
-    constructor() : this(mutableListOf())
 
     @Serializable
     data class VoteOption(var name: String, var votes: Int) {
@@ -13,11 +12,6 @@ data class Vote(var voteOptions: MutableList<VoteOption>) {
     }
 
     fun addTeacherAndUpdate(voteOption: VoteOption) {
-        voteOptions += voteOption
-        updateTeacher(voteOption)
-    }
-
-    fun removeTeacherAndUpdate(voteOption: VoteOption) {
         voteOptions += voteOption
         updateTeacher(voteOption)
     }

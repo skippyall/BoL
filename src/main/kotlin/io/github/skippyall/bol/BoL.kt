@@ -26,14 +26,25 @@ object BoL {
 
     lateinit var javalin: Javalin
 
+    @Volatile
+    var waiting = false
+    @Volatile
+    var shouldStop = false
+
     val saveThread = Thread {
         try {
             while (true) {
+                waiting = true
                 Thread.sleep(15000)
+                waiting = false
                 save()
 
                 for (context in handlers) {
                     context.sendPing()
+                }
+
+                if(shouldStop) {
+                    break
                 }
             }
         } catch (_: InterruptedException) {}
@@ -53,31 +64,32 @@ object BoL {
                 staticFileConfig.location = Location.CLASSPATH
                 staticFileConfig.directory = "static"
             }
-        }
-            .get("/") {
-                it.redirect("/vote.html")
-            }
-            .get("/data") {
-                it.result(Json.encodeToString(votes))
-            }
-            .ws("/websocket") {
-                it.onMessage {
-                    try {
-                        Json.decodeFromString<Message>(it.message()).onReceive(it)
-                    } catch (e: Exception) {
-                        logger.error("Error while decoding message from client", e)
+            config.routes
+                .get("/") {
+                    it.redirect("/vote.html")
+                }
+                .get("/data") {
+                    it.result(Json.encodeToString(votes))
+                }
+                .ws("/websocket") {
+                    it.onMessage {
+                        try {
+                            Json.decodeFromString<Message>(it.message()).onReceive(it)
+                        } catch (e: Exception) {
+                            logger.error("Error while decoding message from client", e)
+                        }
+                    }
+
+                    it.onConnect { handler ->
+                        ListVotesMessage(votes.keys).send(handler)
+                        handlers.add(handler)
+                    }
+
+                    it.onClose { handler ->
+                        handlers.remove(handler)
                     }
                 }
-
-                it.onConnect { handler ->
-                    ListVotesMessage(votes.keys).send(handler)
-                    handlers.add(handler)
-                }
-
-                it.onClose { handler ->
-                    handlers.remove(handler)
-                }
-            }
+        }
 
         javalin.start(25602)
         saveThread.start()
@@ -89,7 +101,11 @@ object BoL {
         }
 
         javalin.stop()
-        saveThread.interrupt()
+
+        shouldStop = true
+        if(waiting) {
+            saveThread.interrupt()
+        }
     }
 
     fun load() {

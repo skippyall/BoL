@@ -7,10 +7,46 @@
     background-color: lime;
 }
 
+.edit_mode{
+    background-color: green;
+}
+
+.danger{
+    background-color: red;
+}
+
+.blur{
+    filter: blur(5px);
+}
+
 #controls{
     margin: 10px;
 }
 
 nav{
     padding-bottom: 10px;
+}
+
+#edit_button{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    padding: 10px;
+    corner: round;
+    transform: translateX(-50%) translateY(-50%);
+    background-color: white;
+    z-index: 1;
+    filter: none;
+}
+
+.edit_button_show{
+    display: grid;
+}
+
+.edit_button_element{
+    margin: 10px;
+}
+
+.edit_button_hide{
+    display: none;
 }

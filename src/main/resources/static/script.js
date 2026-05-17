@@ -52,6 +52,7 @@ function onLoseConnection() {
 function init() {
     initVoteSelect()
     initSortSelect()
+    initEditMode()
     container = document.getElementById("teacher_buttons")
     nameInput = document.getElementById("name")
 }
@@ -130,7 +131,7 @@ function updateTeacher(teacher) {
     var button = findButton(name)
     var paragraph
     if(!button) {
-        var button = document.createElement("button")
+        button = document.createElement("button")
         button.setAttribute("class", "teacher_button")
         button.setAttribute("teacher", name)
         
@@ -168,10 +169,14 @@ function addButton() {
 }
 
 function onButtonClick(teacher) {
-    socket.send(JSON.stringify({
-        "type": "click",
-        "name": teacher
-    }))
+    if(editButtons) {
+        onEditButton(teacher)
+    } else {
+        socket.send(JSON.stringify({
+            "type": "click",
+            "name": teacher
+        }))
+    }
 }
 
 function sortButtons() {
