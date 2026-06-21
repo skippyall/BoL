@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <title>BoL</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="BoL.js"></script>
+</head>
+
+<body>
+    <div id="main_content">
+        <div id="controls">
+            <label for="vote_select">Abstimmung</label>
+            <select id="vote_select"></select>
+
+            <label for="add_button_name">Button hinzufügen</label>
+            <input type="text" id="add_button_name">
+            <button id="add_button_button">OK</button>
+
+            <label for="sort_type">Sortierung</label>
+            <select id="sort_type"></select>
+            <button id="edit_toggle_button">Zum Anpassungsmodus</button>
+        </div>
+        <div id="teacher_buttons"></div>
+    </div>
+    <div id="edit_button" class="edit_button_hide">
+        <label for="edit_name" class="edit_button_element">Name</label>
+        <input type="text" id="edit_name" class="edit_button_element">
+
+        <label for="edit_count" class="edit_button_element">Anzahl</label>
+        <input type="number" id="edit_count" class="edit_button_element">
+
+        <button class="danger edit_button_element" id="delete_button">Button löschen</button>
+
+        <button class="edit_button_element" id="edit_save_button">Speichern</button>
+        <button class="edit_button_element" id="edit_abort_button">Abbrechen</button>
+    </div>
+</body>
+
+</html>

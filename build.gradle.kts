@@ -1,33 +1,77 @@
+@file:OptIn(ExperimentalKotlinGradlePluginApi::class)
+
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+import org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile
+import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack
+
 plugins {
-    kotlin("jvm") version "2.3.20"
-    kotlin("plugin.serialization") version "2.3.20"
-    id("com.gradleup.shadow") version "9.4.0"
+    kotlin("multiplatform")
+    kotlin("plugin.serialization")
 }
 
-group = "io.github.skippyall"
-version = "1.0-SNAPSHOT"
+group = providers.gradleProperty("project_group").get()
+version = providers.gradleProperty("project_version").get()
 
 repositories {
     mavenCentral()
 }
 
-dependencies {
-    testImplementation(kotlin("test"))
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.10.0")
+kotlin {
+    js {
+        browser {
+        }
+        binaries.executable()
+    }
+    jvm {
+        mainRun {
+            mainClass = "io.github.skippyall.bol.BoLKt"
+        }
+        binaries {
+            executable {
+                mainClass = "io.github.skippyall.bol.BoLKt"
+            }
+        }
+    }
 
-    implementation("io.javalin:javalin:7.2.2")
-    implementation("org.slf4j:slf4j-simple:2.0.17")
-}
+    sourceSets {
+        jsMain.dependencies {
 
-tasks.jar {
-    manifest {
-        attributes["Main-Class"] = "io.github.skippyall.bol.BoLKt"
+        }
+
+        commonMain.dependencies {
+            implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:${providers.gradleProperty("kotlin_serialization_version").get()}")
+        }
+
+        jvmMain.dependencies {
+            implementation("io.javalin:javalin:${providers.gradleProperty("javalin_version").get()}")
+            implementation("org.slf4j:slf4j-simple:${providers.gradleProperty("slf4j_version").get()}")
+        }
+    }
+    ext {
+        jvmToolchain(21)
     }
 }
 
-tasks.test {
-    useJUnitPlatform()
+tasks.withType<KotlinJsCompile>().configureEach {
+    compilerOptions {
+        target = "es2015"
+    }
 }
-kotlin {
-    jvmToolchain(21)
+
+tasks.named<ProcessResources>("jvmProcessResources") {
+    val taskName = if (project.hasProperty("isProduction")
+        || project.gradle.startParameter.taskNames.contains("installDist")
+    ) {
+        "jsBrowserProductionWebpack"
+    } else {
+        "jsBrowserDevelopmentWebpack"
+    }
+    val webpackTask = tasks.named<KotlinWebpack>(taskName)
+    dependsOn(webpackTask)
+    from(webpackTask.map {
+        println(it.mainOutputFile)
+        it.mainOutputFile.get().asFile
+    }) {
+        into("static")
+    } // bring output file along into the JAR
 }
