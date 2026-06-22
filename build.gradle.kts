@@ -7,6 +7,7 @@ import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack
 plugins {
     kotlin("multiplatform")
     kotlin("plugin.serialization")
+    id("com.gradleup.shadow")
 }
 
 group = providers.gradleProperty("project_group").get()
@@ -29,6 +30,7 @@ kotlin {
         binaries {
             executable {
                 mainClass = "io.github.skippyall.bol.BoLKt"
+                applicationDistribution.exclude("bin")
             }
         }
     }
@@ -74,4 +76,10 @@ tasks.named<ProcessResources>("jvmProcessResources") {
     }) {
         into("static")
     } // bring output file along into the JAR
+}
+
+tasks.named<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shadowJar") {
+    manifest {
+        attributes["Main-Class"] = "io.github.skippyall.bol.BoLKt"
+    }
 }

@@ -49,7 +49,7 @@ object Webserver {
                 }
         }
 
-        javalin.start(0)
+        javalin.start(BoL.port ?: 0)
         println("Mögliche Adressen:")
         for(address in findLocalIp()) {
             println("http://${address}:${javalin.port()}")
